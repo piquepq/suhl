@@ -68,9 +68,12 @@ int suhlupdate::search_last_nonzero_position(CZLPVector& aq) {
 int suhlupdate::search_column(int position) {
 	this->Uindex = { 1,0,0,3,0,6,0 };
 	this->Uend = { 1,0,0,3,0,6,0 };
+	this->Upivotindex = { -1,-1,2,3,4,5,6 };
 	int i = 0;
 	for (i = 0; i < RowNum; i++) {
-		if (Uindex[Uend[i]] == position)
+		if (Upivotindex[i] == -1)
+			continue;
+		else if (Uindex[Uend[i]] == position)
 			break;
 	}
 	return i;
