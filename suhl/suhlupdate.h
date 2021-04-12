@@ -50,6 +50,8 @@ private:
 
 	//Uæÿ’Û
 	vector<double> Upivotvalues;
+	vector<int> Upivotindex;
+	vector<int> Upivotlookup;
 	vector<double> Uvalues;
 	vector<int> Uindex;
 	vector<int> Ustart;
