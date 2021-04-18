@@ -11,8 +11,10 @@ class suhlupdate
 	suhlupdate(int RowNum,int ColNum);
 
 	void copy_perm(vector<int> perm, vector<int> permback);
-	void copy_L(vector<double> Lvalues, vector<int> Lindex, vector<int> Lstart, vector<double> LRvalues, vector<int> LRindex, vector<int> LRstart);
-	void copy_U(vector<double> Upivotvalues,vector<double> Uvalues, vector<int> Uindex, vector<int> Ustart, vector<int> Uend,vector<double> URvalues, vector<int> URindex, vector<int> URstart,vector<int> URend,vector<int> URspace);
+	void copy_L(vector<double> Lvalues, vector<int> Lindex, vector<int> Lstart, vector<double> LRvalues, vector<int> LRindex, vector<int> LRstart,vector<int>Lpivotindex,vector<int> Lpivotlookup);
+	void copy_U(vector<double> Upivotvalues,vector<double> Uvalues, vector<int> Uindex, vector<int> Ustart, 
+		vector<int> Uend,vector<double> URvalues, vector<int> URindex, vector<int> URstart,vector<int> URend,vector<int> URspace, vector<int> Upivotlookup,
+	vector<int> Upivotindex);
 	void btran(CZLPVector &aq);
 	void ftran(CZLPVector &aq);
 	void btranl(CZLPVector&aq);
@@ -27,6 +29,7 @@ class suhlupdate
 	int search_column(int position);
 
 	void update(CZLPVector& aq, CZLPVector &ep,int ColOut);
+	void updateFT(CZLPVector* aq, CZLPVector* ep, int iRow);
 private:
 	//矩阵的大小
 	const int RowNum;
@@ -40,6 +43,8 @@ private:
 	vector<int> permback;
 	//L矩阵
 
+	vector<int>Lpivotindex;
+	vector<int> Lpivotlookup;
 	vector<double> Lvalues;
 	vector<int> Lindex;
 	vector<int> Lstart;
@@ -64,8 +69,11 @@ private:
 	vector<int> URspace;
 
 	//R矩阵,每一行为一个eta矩阵
-	vector<int> Rvalues;
+	vector<double> Rpivotvalues;
+	vector<int> RpivotIndex;
+	vector<double> Rvalues;
 	vector<int> Rindex;
+	vector<int> Rstart;
 
 };
 
