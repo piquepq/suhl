@@ -47,15 +47,15 @@ void suhlupdate::ftran(CZLPVector &aq) {
 	ftranu(aq);
 }
 void suhlupdate::btranl(CZLPVector&rhs) {
-	// Alias to RHS
+
 	int RHScount = 0;
 	int* RHSindex = &rhs.Index[0];
 	double* RHSarray = &rhs.Array[0];
-	// Alias to factor L
+
 	const int* LRstart = &this->LRstart[0];
 	const int* LRindex = this->LRindex.size() > 0 ? &this->LRindex[0] : NULL;
 	const double* LRvalue = this->LRvalues.size() > 0 ? &this->LRvalues[0] : NULL;
-	// Transform
+
 	for (int i = RowNum - 1; i >= 0; i--) {
 		int pivotRow = Lpivotindex[i];
 		const double pivotX = RHSarray[pivotRow];
@@ -70,26 +70,26 @@ void suhlupdate::btranl(CZLPVector&rhs) {
 		else
 			RHSarray[pivotRow] = 0;
 	}
-	// Save the count
+
 	rhs.set_nonzeronum(RHScount);
 }
 void suhlupdate::btranu(CZLPVector&rhs) {
-	// Alias to non constant
+
 	int RHScount = 0;
 	int* RHSindex = &rhs.Index[0];
 	double* RHSarray = &rhs.Array[0];
 
-	// Alias to the factor
+
 	const int* URstart = &this->URstart[0];
 	const int* URend = &this->URend[0];
 	const int* URindex = &this->URindex[0];
 	const double* URvalue = &this->URvalues[0];
 
-	// Transform
+
 	int UpivotCount = Upivotindex.size();
 	for (int iLogic = 0; iLogic < UpivotCount; iLogic++) {
 		if (Upivotindex[iLogic] == -1) continue;
-		// Normal part
+
 		const int pivotRow = Upivotindex[iLogic];
 		double pivotX = RHSarray[pivotRow];
 		if (fabs(pivotX) > 0) {
@@ -104,17 +104,17 @@ void suhlupdate::btranu(CZLPVector&rhs) {
 		else
 			RHSarray[pivotRow] = 0;
 	}
-	// Save the count
+
 	rhs.set_nonzeronum(RHScount);
-	// The update part
+
 	btranr(rhs);
 }
 void suhlupdate::ftranl(CZLPVector&rhs) {
-	// Alias to RHS
+
 	int RHScount = 0;
 	int* RHSindex = &rhs.Index[0];
 	double* RHSarray = &rhs.Array[0];
-	// Alias to factor L
+
 	const int* Lstart = &this->Lstart[0];
 	const int* Lindex = this->Lindex.size() > 0 ? &this->Lindex[0] : NULL;
 	const double* Lvalue = this->Lvalues.size() > 0 ? &this->Lvalues[0] : NULL;
@@ -132,7 +132,7 @@ void suhlupdate::ftranl(CZLPVector&rhs) {
 		else
 			RHSarray[pivotRow] = 0;
 	}
-	// Save the count
+
 	rhs.set_nonzeronum(RHScount);
 }
 void suhlupdate::ftranu(CZLPVector&rhs) {
@@ -180,11 +180,11 @@ void suhlupdate::ftranr(CZLPVector &vector) {
 	const int* PFindex = this->Rindex.size() > 0 ? &this->Rindex[0] : NULL;
 	const double* PFvalue = this->Rvalues.size() > 0 ? &this->Rvalues[0] : NULL;
 
-	// Alias to non constant
+
 	int RHScount = vector.get_nonzeronum();
 	int* RHSindex = &vector.Index[0];
 	double* RHSarray = &vector.Array[0];
-	// Forwardly apply row ETA
+
 	for (int i = 0; i < PFpivotCount; i++) {
 		int iRow = RpivotIndex[i];
 		double value0 = RHSarray[iRow];
@@ -359,7 +359,7 @@ void suhlupdate::updateFT(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 	Upivotindex.push_back(ColOut);
 	Upivotvalues.push_back(pivot );
 
-	// 将新的校园部分储存在eta矩阵中
+	// 将新的消元部分储存在eta矩阵中
 	//将原来第p行的对应于新的pivot
 
 	//添加pivot的值
