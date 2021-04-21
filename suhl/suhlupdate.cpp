@@ -9,6 +9,8 @@ using std::vector;
 suhlupdate::suhlupdate(int RowNum,int ColNum):
 	RowNum(RowNum), ColNum(ColNum) {
 	Steps = 0;
+	for (int i = 0; i < RowNum; i++)
+		workarray[i] = 0;
 }
 
 void suhlupdate::copy_perm(vector<int> perm, vector<int> permback) {
@@ -61,7 +63,7 @@ void suhlupdate::btranl(CZLPVector&rhs) {
 		const double pivotX = RHSarray[pivotRow];
 		if (fabs(pivotX) > 0) {
 			RHSindex[RHScount++] = pivotRow;
-			RHSarray[pivotRow] = pivotX;//????
+			RHSarray[pivotRow] = pivotX;
 			const int start = LRstart[i];
 			const int end = LRstart[i + 1];
 			for (int k = start; k < end; k++)
@@ -239,6 +241,8 @@ void suhlupdate::btranr(CZLPVector &vector){
 }
 
 int suhlupdate::search_last_nonzero_position(CZLPVector& aq) {
+
+
 	int i = aq.Array.size()-1;
 	while (aq.Array[i] == 0) {
 		i--;
@@ -262,11 +266,30 @@ int suhlupdate::search_column(int position) {
 }
 
 
-void suhlupdate::updateFT(CZLPVector* aq, CZLPVector* ep, int ColOut) {
+void suhlupdate::expandrow(int row) {
+
+	//将其初始化为0向量
+	for (int i = 0; i < RowNum; i++) {
+		workarray[i] = 0;
+	}
+	//将第p行填充进workarray
+	for (int i = URstart[row]; i < URend[row]; i++) {
+		int position = Upivotlookup[Uindex[i]];
+		workarray[position] = URvalues[i];
+	}
+	
+
+}
+
+
+void suhlupdate::update(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 	//标记删除出基列
 	int out = Upivotlookup[ColOut];
 	double pivot = Upivotvalues[out];
 	Upivotindex[out] = -1;
+	double alpha = Upivotvalues[out];
+
+	expandrow(out);
 
 	// 搜索删除列存储中的对应元素
 	for (int k = Ustart[out]; k < Uend[out]; k++) {
@@ -284,10 +307,11 @@ void suhlupdate::updateFT(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 	//求得新入基向量的最后一个元素在哪里
 	int aqLen = aq->Index[aq->Index.size() - 1];
 	// 找到排列矩阵，看具体需要该行插入到第几列
+
 	int insertposition = Upivotlookup[aqLen];
 
 
-	//删除out行的前面的元素，先在列存储李删除，再在行存储里删除
+	//删除out行的的元素，先在列存储李删除，后面会改变的元素再最后添加
 	for (int k = URstart[out]; k < URend[out]; k++) {
 		int iLogic = Upivotlookup[URindex[k]];
 		if (iLogic > aqLen) {
@@ -297,7 +321,7 @@ void suhlupdate::updateFT(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 		int iLast = --Uend[iLogic];
 		for (; iFind <= iLast; iFind++)
 			if (Uindex[iFind] == ColOut) 
-				break;
+				break; 
 		Uindex[iFind] = Uindex[iLast];
 		Uvalues[iFind] = Uvalues[iLast];
 
@@ -307,16 +331,16 @@ void suhlupdate::updateFT(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 		URspace[out]++;
 	}
 
-	// 将aq插入到U中
-	Ustart.push_back(Uindex.size());
+	// 将aq插入到U中,直接insert到out列之前
+	Ustart.insert(Ustart.begin()+out,Uindex.size());
 	for (int i = 0; i < aq->Index.size(); i++)
 		if (aq->Index[i] != ColOut) {
 			Uindex.push_back(aq->Index[i]);
 			Uvalues.push_back(aq->PackedArray[i]);
 		}
-	Uend.push_back(Uindex.size());
-	int UstartX = Ustart.back();
-	int UendX = Uend.back();
+	Uend.insert(Ustart.begin() + out, Uindex.size());
+	int UstartX = Ustart[out];
+	int UendX = Uend[out];
 
 	// 将aq的元素插入到UR中
 	for (int k = UstartX; k < UendX; k++) {
@@ -350,14 +374,14 @@ void suhlupdate::updateFT(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 	}
 
 	// 储存UR的部分
-	URstart.push_back(URstart[out]);
-	URend.push_back(URstart[out]);
-	URspace.push_back(URspace[out] + URend[out] - URstart[out]);
+	URstart.insert(URstart.begin()+out,URstart[out]);
+	URend.insert(URend.begin()+out,URend[out]);
+	URspace.insert(URspace.begin()+out,URspace[out] + URend[out] - URstart[out]);
 
 	// 将新pivot更新
-	Upivotlookup[ColOut] = Upivotindex.size();
-	Upivotindex.push_back(ColOut);
-	Upivotvalues.push_back(pivot );
+	Upivotlookup[ColOut] = out;
+	Upivotindex.insert(Upivotindex.begin()+out,ColOut);
+	Upivotvalues.insert(Upivotvalues.begin()+out,pivot );
 
 	// 将新的消元部分储存在eta矩阵中
 	//将原来第p行的对应于新的pivot
@@ -378,6 +402,7 @@ void suhlupdate::updateFT(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 
 
 	//看是否需要重新分解
+	Steps++;
 	if (Steps>100)
 	{
 		flag = true;

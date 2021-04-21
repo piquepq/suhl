@@ -28,8 +28,10 @@ class suhlupdate
 	//寻找需要插入到哪一列
 	int search_column(int position);
 
-	void update(CZLPVector& aq, CZLPVector &ep,int ColOut);
-	void updateFT(CZLPVector* aq, CZLPVector* ep, int iRow);
+	void update(CZLPVector* aq, CZLPVector* ep, int ColOut);
+
+	void expandrow(int row);
+
 private:
 	//矩阵的大小
 	const int RowNum;
@@ -75,5 +77,6 @@ private:
 	vector<int> Rindex;
 	vector<int> Rstart;
 
+	vector<double> workarray;
 };
 
