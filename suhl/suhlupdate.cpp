@@ -311,7 +311,7 @@ void suhlupdate::update(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 	int insertposition = Upivotlookup[aqLen];
 
 
-	//删除out行的的元素，先在列存储李删除，后面会改变的元素再最后添加
+	//删除out行的的元素，先在列存储里删除，后面行元素会改变的元素再最后添加
 	for (int k = URstart[out]; k < URend[out]; k++) {
 		int iLogic = Upivotlookup[URindex[k]];
 		if (iLogic > aqLen) {
@@ -325,10 +325,6 @@ void suhlupdate::update(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 		Uindex[iFind] = Uindex[iLast];
 		Uvalues[iFind] = Uvalues[iLast];
 
-		int end= --URend[out];
-		URindex[k] = URindex[end];
-		URvalues[k] = URvalues[end];
-		URspace[out]++;
 	}
 
 	// 将aq插入到U中,直接insert到out列之前
