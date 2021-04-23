@@ -327,7 +327,7 @@ void suhlupdate::update(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 
 	}
 
-	// 将aq插入到U中,直接insert到out列之前
+	// 将aq插入到U中,直接insert到out列之前，pivot值在求出消元部分后最后加入
 	Ustart.insert(Ustart.begin()+out,Uindex.size());
 	for (int i = 0; i < aq->Index.size(); i++)
 		if (aq->Index[i] != ColOut) {
@@ -367,12 +367,30 @@ void suhlupdate::update(CZLPVector* aq, CZLPVector* ep, int ColOut) {
 		int iPut = URend[iLogic]++;
 		URindex[iPut] = ColOut;
 		URvalues[iPut] = Uvalues[k];
+	}   
+	
+	//建立新向量消元出基部分
+	vector<int> eliminationPart(aqLen - out, 0);
+	//用回代方法求消元部分
+	for (int i = out + 1; i < aqLen; i++) {
+		int pivotvalue = Upivotvalues[i];
+		int res = 0;
+		for (int j = out + 1; j < i; j++) {
+			res+=eliminationPart[i-out]*
+		}
 	}
 
-	// 储存UR的部分
+
+
+
+
+	
+	// 将第p行与新的储存UR的部分，有问题？？？
 	URstart.insert(URstart.begin()+out,URstart[out]);
 	URend.insert(URend.begin()+out,URend[out]);
 	URspace.insert(URspace.begin()+out,URspace[out] + URend[out] - URstart[out]);
+	
+	
 
 	// 将新pivot更新
 	Upivotlookup[ColOut] = out;
