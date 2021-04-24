@@ -14,7 +14,7 @@ void CZLPVector::initial(int size)
 {
 	Size = size;			  //向量维数
 	NonZeroNum = 0;			  //初始化非零元素个数
-	IsPacked = true;			  //初始化为需要被压缩
+	IsPacked = true;		  //初始化为需要被压缩
 	Array.assign(size, 0);	  //初始化原向量
 	Index.resize(size);		  //初始化非零元下标
 	PackedArray.resize(size); //初始化压缩后的向量
@@ -43,8 +43,8 @@ void CZLPVector::set(const double *a, int size)
 void CZLPVector::clear()
 {
 	//Array.assign(Size, 0); //清空原向量
-	Size = 0;		//向量置0
-	NonZeroNum = 0; //清空非零元素个数
+	Size = 0;		  //向量置0
+	NonZeroNum = 0;	  //清空非零元素个数
 	IsPacked = false; //重置压缩状态为不需要被压缩
 }
 
@@ -78,7 +78,6 @@ void CZLPVector::print_index()
 	std::cout << std::endl;
 }
 
-
 const int CZLPVector::get_nonzeronum()
 {
 	return NonZeroNum;
@@ -94,6 +93,14 @@ void CZLPVector::pack()
 	if (IsPacked)
 	{
 		IsPacked = false;
+		for (int i = 0; i < Array.size(); i++)
+		{
+			if (Array[i] != 0)
+			{
+				Index[NonZeroNum] = i;
+				NonZeroNum++;
+			}
+		}
 		for (int i = 0; i < NonZeroNum; i++)
 		{
 			const int index = Index[i];	   //取非零元下标
@@ -102,7 +109,8 @@ void CZLPVector::pack()
 	}
 }
 
-void CZLPVector::set_size(int size){
+void CZLPVector::set_size(int size)
+{
 	Size = size;
 }
 
