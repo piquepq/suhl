@@ -1,9 +1,6 @@
-﻿  suhlupdate.cpp
+﻿  suhl.cpp
 e:\suhl\suhl\czlpvector.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-e:\suhl\suhl\suhlupdate.cpp(382): warning C4018: “<”: 有符号/无符号不匹配
-e:\suhl\suhl\suhlupdate.cpp(383): warning C4018: “<”: 有符号/无符号不匹配
-e:\suhl\suhl\suhlupdate.cpp(390): warning C4018: “<”: 有符号/无符号不匹配
-e:\suhl\suhl\suhlupdate.cpp(419): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-e:\suhl\suhl\suhlupdate.cpp(463): warning C4018: “<”: 有符号/无符号不匹配
-e:\suhl\suhl\suhlupdate.cpp(484): warning C4018: “<”: 有符号/无符号不匹配
+e:\suhl\suhl\suhl.cpp(37): warning C4018: “<”: 有符号/无符号不匹配
+e:\suhl\suhl\suhl.cpp(44): warning C4101: “insertPosition”: 未引用的局部变量
+e:\suhl\suhl\suhl.cpp(44): warning C4101: “position”: 未引用的局部变量
   suhl.vcxproj -> E:\suhl\Debug\suhl.exe

@@ -31,10 +31,8 @@ int main()
 	vector<double> UPivotValue({1, 1, 1, 1, 1});
 	vector<int> URspace(5, 0);
 	suhl.copy_U(UPivotValue, UValue, UIndex, UStart, UEnd, URValue, URIndex, URStart, UREnd, URspace, UPivotLookup, UPivot);
-	vector<int> perm = {1, 2, 3, 4, 5};
-	vector<int> permback = {5, 4, 3, 2, 1};
-	suhl.copy_perm(perm, permback);
-	vector<double> res = {0, 0, 0, 1, 0};
+
+	vector<double> res = {0, 1, 0, 1, 0};
 	double *aq1 = new double[RowNum];
 	for (int i = 0; i < res.size(); i++)
 	{
@@ -42,11 +40,11 @@ int main()
 	}
 	CZLPVector aq(5);
 	aq.set(aq1, 5);
-	suhl.ftranl(aq);
+	//suhl.ftranl(aq);
 	int position, insertPosition;
 	// position = suhl.search_last_nonzero_position(*aq);
 	// insertPosition = suhl.search_column(position);
-	suhl.update(aq, 3);
+	suhl.update(aq, 1);
 	// cout << insertPosition;
 	suhl.show();
 	delete[] aq1;
