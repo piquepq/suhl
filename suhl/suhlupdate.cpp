@@ -316,6 +316,13 @@ void suhlupdate::expandrow(int row)
 	for (int i = URstart[row]; i < URend[row]; i++)
 	{
 		int position = Upivotlookup[Uindex[i]];
+		int res = 0;
+		for (int i = 0; i < position; i++) {
+			if (Upivotindex[i] = -1) {
+				res++;
+			}
+		}
+		position -= res;
 		workarray[position] = URvalues[i];
 	}
 }
