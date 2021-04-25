@@ -289,18 +289,29 @@ int suhlupdate::search_last_nonzero_position(CZLPVector &aq)
 	}
 	return i;
 }
+
+
 //还要加排除出基出基列
-int suhlupdate::search_column(int position)
-{
-	int i = 0;
-	for (i = 0; i < RowNum; i++)
+int suhlupdate::search_column(int aqLen)
+{	
+	if (aqLen == RowNum - 1)
+		return Ustart.size() ;
+	int res = 0;
+	for (int i = 0; i < Upivotindex.size(); i++)
 	{
-		if (Upivotindex[i] == -1)
-			continue;
-		else if (Uindex[Uend[i]] == position)
+		
+		if (Upivotindex[i] != -1) 
+		{
+			res++;
+		}
+		if (res == aqLen) 
+		{
 			break;
+		}
 	}
-	return i;
+	//因为要插在该列后面一列
+	res += 1;
+	return res;
 }
 
 void suhlupdate::expandrow(int row)
@@ -344,6 +355,13 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 	int out = Upivotlookup[ColOut];
 	double pivot ;
 	
+	//求得新入基向量的最后一个元素在哪里
+	int aqLen = aq.Index[aq.get_nonzeronum() - 1];
+
+	// 找到排列矩阵，看具体需要该行插入到第几列
+//???????
+	int insertposition = search_column(aqLen);
+
 	//标记删除，U中几列对应原矩阵第几列
 	Upivotindex[out] = -1;
 	double alpha = Upivotvalues[out];
@@ -354,7 +372,6 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 	// 搜索删除列存储中的对应元素
 	for (int k = Ustart[out]; k < Uend[out]; k++)
 	{
-
 
 		//Uindex对应的是变换前的坐标
 		int iLogic = Upivotlookup[Uindex[k]];
@@ -367,20 +384,13 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 		URvalues[iFind] = URvalues[iLast]; 
 		URspace[iLogic]++;
 	}
-	//求得新入基向量的最后一个元素在哪里
-	int aqLen = aq.Index[aq.get_nonzeronum() - 1];
-	// 找到排列矩阵，看具体需要该行插入到第几列
 
-	int insertposition = Upivotlookup[aqLen];
 
-	//删除out行的元素，先在列存储里删除，后面行元素会改变的元素再最后添加
+	//删除out行的元素，先在列存储里删除，后面行元素会改变的元素再最后添加,可能会形成fill-in
 	for (int k = URstart[out]; k < URend[out]; k++)
 	{
 		int iLogic = Upivotlookup[URindex[k]];
-		if (iLogic > aqLen)
-		{
-			continue;
-		}
+
 		int iFind = Ustart[iLogic];
 		int iLast = --Uend[iLogic];
 		for (; iFind <= iLast; iFind++)
@@ -392,8 +402,8 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 		Uvalues[iFind] = Uvalues[iLast];
 	}
 
-	// 将aq插入到U中,直接insert到aqLen列之前，pivot值在求出消元部分后最后加入 
-	Ustart.insert(Ustart.begin() + aqLen, Uindex.size());
+	// 将aq插入到U中,直接insert到insertposition列之前，pivot值在求出消元部分后最后加入 
+	Ustart.insert(Ustart.begin() + insertposition, Uindex.size());
 	for (int i = 0; i < aq.Index.size(); i++)
 	{
 		if (aq.Index[i] != ColOut)
@@ -407,9 +417,9 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 			continue; 
 		}
 	}
-	Uend.insert(Uend.begin() + aqLen, Uindex.size());
-	int UstartX = Ustart[aqLen];
-	int UendX = Uend[aqLen];
+	Uend.insert(Uend.begin() + insertposition, Uindex.size());
+	int UstartX = Ustart[insertposition];
+	int UendX = Uend[insertposition];
 
 	// 将aq的元素插入到UR中
 	for (int k = UstartX; k < UendX; k++)
@@ -444,11 +454,11 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 		URvalues[iPut] = Uvalues[k];
 	}
 	//建立新向量消元出基部分
-	//cout << aqLen - out << endl;
-	double *eliminationPart = new double[aqLen - out];
-	memset(eliminationPart, 0, (aqLen - out) * sizeof(double));
+	//cout << insertposition - out << endl;
+	double *eliminationPart = new double[insertposition - out];
+	memset(eliminationPart, 0, (insertposition - out) * sizeof(double));
 	//用回代方法求消元部分
-	for (int i = out + 1; i < aqLen; i++)
+	for (int i = out + 1; i < insertposition; i++)
 	{
 		double pivotvalue = Upivotvalues[i];
 		double res = workarray[i] / pivotvalue;
@@ -463,13 +473,13 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 	}
 
 
-	CZLPVector ep(aqLen - out);
-	ep.set(eliminationPart, aqLen - out);
+	CZLPVector ep(insertposition - out);
+	ep.set(eliminationPart, insertposition - out);
 	delete[] eliminationPart;
 
 	// 将第p行与新的储存UR的部分，有问题？？？
-	URstart.insert(URstart.begin() + aqLen, URindex.size());
-	for (int i = aqLen + 1; i < workarray.size(); i++)
+	URstart.insert(URstart.begin() + insertposition, URindex.size());
+	for (int i = insertposition + 1; i < workarray.size(); i++)
 	{
 		if (workarray[i] != 0)
 		{
@@ -477,13 +487,13 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 			URvalues.push_back(workarray[i]);
 		}
 	}
-	URend.insert(URend.begin() + aqLen, URindex.size());
-	URspace.insert(URspace.begin() + aqLen, URspace[out] + URend[out] - URstart[out]);
+	URend.insert(URend.begin() + insertposition, URindex.size());
+	URspace.insert(URspace.begin() + insertposition, URspace[out] + URend[out] - URstart[out]);
 
 	// 将新pivot更新
-	Upivotlookup[ColOut] = aqLen;
-	Upivotindex.insert(Upivotindex.begin() + aqLen, ColOut);
-	Upivotvalues.insert(Upivotvalues.begin() + aqLen, pivot);
+	Upivotlookup[ColOut] = insertposition;
+	Upivotindex.insert(Upivotindex.begin() + insertposition, ColOut);
+	Upivotvalues.insert(Upivotvalues.begin() + insertposition, pivot);
 
 	// 将新的消元部分储存在eta矩阵中
 	//将原来第p行的对应于新的pivot

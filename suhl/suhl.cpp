@@ -44,7 +44,7 @@ int main()
 	int position, insertPosition;
 	// position = suhl.search_last_nonzero_position(*aq);
 	// insertPosition = suhl.search_column(position);
-	suhl.update(aq, 1);
+	suhl.update(aq, 3);
 	// cout << insertPosition;
 	suhl.show();
 	delete[] aq1;
