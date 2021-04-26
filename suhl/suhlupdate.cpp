@@ -395,6 +395,7 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 		int iLast = --Uend[iLogic];
 		for (; iFind <= iLast; iFind++)
 			if (Uindex[iFind] == ColOut)
+
 				break;
 		assert(iFind < Uindex.size());
 		assert(iLast < Uindex.size());
@@ -506,7 +507,9 @@ void suhlupdate::update(CZLPVector &aq, int ColOut)
 		if (i != out)
 		{
 			Rvalues.push_back(ep.Array[i]);
-			Rindex.push_back(i ); //要变换前的value
+			Rindex.push_back(i
+			
+			); //要变换前的value
 		}
 	}
 
